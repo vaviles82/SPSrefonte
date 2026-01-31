@@ -1,4 +1,3 @@
-// backend/src/index.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -15,10 +14,10 @@ app.use(express.json());
 
 // Route de test
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Le serveur de SwissPaddelStars fonctionne !' });
+  res.json({ status: 'OK', message: 'Le serveur de SwissPadelStars fonctionne !' });
 });
 
-// Route pour créer un contact (Test BDD)
+// Route POST : Enregistrer un message
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
   try {
@@ -31,23 +30,22 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// Route GET : Récupérer tous les messages (Pour la page Admin)
+app.get('/api/contact', async (req, res) => {
+  try {
+    const contacts = await prisma.contact.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération" });
+  }
+});
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`Serveur SPS lancé sur http://localhost:${PORT}`);
   });
 }
 
-app.post('/api/contact', async (req, res) => { //REPRISE
-  const { name, email, message } = req.body;
-  try {
-    const contact = await prisma.contact.create({
-      data: { name, email, message }
-    });
-    res.status(201).json(contact);
-  } catch (error) {
-    res.status(500).json({ error: "Erreur lors de l'enregistrement" });
-  }
-});
-
-
-export default app; // Permet à Supertest d'utiliser l'app
+export default app; // Important pour les tests

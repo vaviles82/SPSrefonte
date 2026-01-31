@@ -23,5 +23,16 @@ services:
     depends_on:
       - db
 
+  client:
+    build: ./frontend
+    container_name: sps_client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:3000 # Pour que React sache où est l'API
+
 volumes:
   postgres_data:
