@@ -37,16 +37,20 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci # 'npm ci' est plus propre pour les serveurs de CI que 'npm install'
 
       - name: Push Database Schema
         working-directory: ./backend
-        run: npx prisma db push # <-- Remplace 'migrate deploy' par 'db push'
+        run: npx prisma db push --accept-data-loss
         env:
           DATABASE_URL: postgresql://user_sps:password_sps@localhost:5432/sps_test_db
 
+      - name: Generate Prisma Client
+        working-directory: ./backend
+        run: npx prisma generate
+
       - name: Run Tests
         working-directory: ./backend
-        run: npm test
+        run: NODE_OPTIONS=--experimental-vm-modules npx jest
         env:
           DATABASE_URL: postgresql://user_sps:password_sps@localhost:5432/sps_test_db
