@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    container_name: sps_db
+    restart: always
+    environment:
+      POSTGRES_USER: user_sps
+      POSTGRES_PASSWORD: password_sps
+      POSTGRES_DB: sps_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: ./backend
+    container_name: sps_api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://user_sps:password_sps@db:5432/sps_db?schema=public
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
