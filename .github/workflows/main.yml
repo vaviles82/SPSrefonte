@@ -39,9 +39,9 @@ jobs:
         working-directory: ./backend
         run: npm install
 
-      - name: Run Database Migrations
+      - name: Push Database Schema
         working-directory: ./backend
-        run: npx prisma migrate deploy
+        run: npx prisma db push # <-- Remplace 'migrate deploy' par 'db push'
         env:
           DATABASE_URL: postgresql://user_sps:password_sps@localhost:5432/sps_test_db
 
