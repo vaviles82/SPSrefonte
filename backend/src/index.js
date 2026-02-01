@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import newsletterRoutes from './routes/newsletterRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
-import articleRoutes from './routes/articleRoutes.js';//DANGER 
+import articleRoutes from './routes/articleRoutes.js';
 
 
 dotenv.config();
@@ -13,16 +13,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: '*', // Pour le développement, on autorise tout le monde
+  origin: 'http://localhost', // Plus de "*" ici, on met l'URL précise du front
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true 
 }));
 app.use(express.json());
 
+app.get('/debug-test', (req, res) => {
+  console.log("DEBUG: Requête reçue sur /debug-test");
+  res.send("L'API répond bien !");
+});
+
 // Routes propres et segmentées
-app.use('/api/articles', articleRoutes);//DANGER
-app.use('/api', requestRoutes);
-app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/articles', articleRoutes);
+app.use('/api/requests', requestRoutes);
+app.use('/api/email', newsletterRoutes);
 
 // On garde juste la route de santé pour Docker
 app.get('/health', (req, res) => {

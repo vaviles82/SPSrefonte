@@ -1,19 +1,18 @@
-// backend/src/controllers/emailController.js
-const emailService = require("../services/emailServices");
-const { PrismaClient } = require("@prisma/client");
+import emailService from "../services/emailServices.js"; // Ajout de .js si nécessaire
+import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
 // Get email template from database and send email
-const sendEmail = async (req, res) => {
+export const sendEmail = async (req, res) => {
   try {
     const { templateId, to, subject, dynamicData } = req.body;
     console.log("sendEmailWithTemplate", req.body);
 
-    // Send email
     await emailService.sendEmail({
       to,
       subject,
-      dynamicData: dynamicData, // Pass the dynamicData directly to the email service
+      dynamicData: dynamicData,
       templateId,
     });
 
@@ -25,7 +24,7 @@ const sendEmail = async (req, res) => {
 };
 
 // Send emails in batch to multiple recipients
-const sendEmailInBatch = async (req, res) => {
+export const sendEmailInBatch = async (req, res) => {
   try {
     const { templateId, subject, recipients } = req.body;
     console.log("sendEmailInBatch", { templateId, subject, recipientCount: recipients.length });
@@ -34,11 +33,7 @@ const sendEmailInBatch = async (req, res) => {
       return res.status(400).json({ error: "No recipients provided" });
     }
 
-    if (!templateId) {
-      return res.status(400).json({ error: "Template ID is required" });
-    }
-
-    // Format recipients data for batch sending
+    // Note: on garde templateId ici pour la compatibilité avec ton service email
     const formattedRecipients = recipients.map(recipient => ({
       to: recipient.email,
       dynamicData: {
@@ -49,7 +44,6 @@ const sendEmailInBatch = async (req, res) => {
       }
     }));
 
-    // Send batch email
     await emailService.sendBatchEmail({
       templateId,
       subject,
@@ -65,12 +59,11 @@ const sendEmailInBatch = async (req, res) => {
   }
 };
 
-const getTemplates = async (req, res) => {
+export const getTemplates = async (req, res) => {
   try {
     const templates = await emailService.getTemplates();
-    console.log("templates", templates);
-    if (templates.length === 0) {
-      return res.status(404).json({ error: "No templates found" });
+    if (!templates || templates.length === 0) {
+      return res.status(200).json([]); // On renvoie un tableau vide plutôt qu'une 404
     }
     return res.status(200).json(templates);
   } catch (error) {
@@ -79,9 +72,9 @@ const getTemplates = async (req, res) => {
   }
 };
 
-const getSuscribers = async (req, res) => {
+export const getSuscribers = async (req, res) => {
     try {
-      const suscribers = await prisma.request.findMany({
+      const subscribers = await prisma.request.findMany({
         where: {
           newsletter: true,
         },
@@ -95,16 +88,17 @@ const getSuscribers = async (req, res) => {
           status: true,
           email: true,
           newsletter: true,
-          content: false,
         },
       });
-      return res.status(200).json(suscribers);
+      return res.status(200).json(subscribers);
     } catch (error) {
-      console.error("Error getting suscribers:", error);
-      return res.status(500).json({ error: "Failed to get suscribers" });
+      console.error("Error getting subscribers:", error);
+      return res.status(500).json({ error: "Failed to get subscribers" });
     }
 };
-module.exports = {
+
+// Export par défaut pour l'import dans emailRoutes.js
+export default {
   sendEmail,
   getTemplates,
   getSuscribers,

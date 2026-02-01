@@ -22,9 +22,18 @@ export const getAllSubscribers = async (req, res) => {
     const subscribers = await prisma.newsletterSubscriber.findMany({
       orderBy: { createdAt: 'desc' }
     });
-    res.status(200).json(subscribers);
+    // On s'assure de renvoyer un tableau
+    res.status(200).json(subscribers || []);
   } catch (error) {
-    console.error("Erreur récupération abonnés:", error);
+    console.error("ERREUR PRISMA:", error); // CE LOG TE DIRA TOUT
     res.status(500).json({ message: "Erreur lors de la récupération des abonnés" });
+  }
+};
+
+export const getTemplates = async (req, res) => {
+  try {
+    res.status(200).json({ templates: [] });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur templates" });
   }
 };

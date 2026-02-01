@@ -2,13 +2,11 @@ import prisma from "../config/db.js";
 
 export const getArticles = async (req, res) => {
   try {
-    const { category } = req.query; // On récupère "News", "Blog" ou "Events" depuis l'URL
-
+    const { category } = req.query;
     const articles = await prisma.article.findMany({
-      where: category ? { category: category } : {}, // Si category est fourni, on filtre. Sinon, on prend tout.
+      where: category ? { category: category } : {},
       orderBy: { createdAt: 'desc' }
     });
-
     res.json(articles);
   } catch (error) {
     console.error("Erreur Prisma:", error.message);
@@ -16,12 +14,18 @@ export const getArticles = async (req, res) => {
   }
 };
 
-// Créer un article
 export const createArticle = async (req, res) => {
   const { title, teaser, content, image, category } = req.body;
   try {
     const article = await prisma.article.create({
-      data: { title, teaser, content, image, category }
+      data: { 
+        title, 
+        // Si teaser est vide, on prend les 100 premiers caractères du contenu
+        teaser: teaser || (content ? content.substring(0, 100) + "..." : ""), 
+        content, 
+        image, 
+        category 
+      }
     });
     res.status(201).json(article);
   } catch (error) {
@@ -30,7 +34,6 @@ export const createArticle = async (req, res) => {
   }
 };
 
-// Récupérer un article seul
 export const getArticleById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -42,7 +45,6 @@ export const getArticleById = async (req, res) => {
   }
 };
 
-// Supprimer un article
 export const deleteArticle = async (req, res) => {
   const { id } = req.params;
   try {
@@ -53,14 +55,19 @@ export const deleteArticle = async (req, res) => {
   }
 };
 
-// Mettre à jour un article
 export const updateArticle = async (req, res) => {
   const { id } = req.params;
   const { title, teaser, content, image, category } = req.body;
   try {
     const updated = await prisma.article.update({
       where: { id: parseInt(id) },
-      data: { title, teaser, content, image, category }
+      data: { 
+        title, 
+        teaser: teaser || (content ? content.substring(0, 100) + "..." : ""),
+        content, 
+        image, 
+        category 
+      }
     });
     res.json(updated);
   } catch (error) {
