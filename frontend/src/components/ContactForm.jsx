@@ -26,15 +26,20 @@ const ContactForm = () => {
     e.preventDefault();
     setStatus({ type: 'info', message: 'Envoi en cours...' });
 
-    // Formatage des données pour l'API backend
+    // Formatage CORRECT pour correspondre au schema.prisma et au contrôleur
     const payload = {
-      name: `${formData.prenom} ${formData.nom}`,
+      first_name: formData.prenom,
+      last_name: formData.nom,
       email: formData.email,
-      message: `Sujet: ${formData.sujet} | Tel: ${formData.telephone} | Société: ${formData.societe || 'N/A'}`
+      phone_number: formData.telephone,
+      company: formData.societe || 'N/A',
+      content: formData.sujet, // On envoie le sujet ou le corps du message ici
+      newsletter: formData.newsletter,
+      status: "NEW"
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/contact', {
+      const response = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

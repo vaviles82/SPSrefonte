@@ -12,20 +12,17 @@ function Login() {
     setCredentials({ ...credentials, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    // Simulation de connexion basée sur ton script de Seed
-    // Nous ferons l'appel API réel une fois le frontend stabilisé
-    if (credentials.email === "admin@sps.ch" && credentials.password === "password123") {
-      localStorage.setItem("isAdmin", "true");
-      navigate("/admin-sps");
+    
+    // Test ultra-simple pour ton développement
+    if (credentials.email === "admin@sps.ch" && credentials.password === "ADMIN") {
+      localStorage.setItem('isAdmin', 'true');
+      localStorage.setItem('user', JSON.stringify({ email: "admin@sps.ch" }));
+      window.location.href = "/admin"; // On utilise window.location pour forcer le rafraîchissement du App.jsx
     } else {
-      setError("Identifiants incorrects. Veuillez réessayer.");
+      alert("Identifiants incorrects");
     }
-    setLoading(false);
   };
 
   return (

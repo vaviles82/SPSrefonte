@@ -3,42 +3,46 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // On reste sur postgres pour Docker
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Admin {
+model ContactRequest {
+  id           Int      @id @default(autoincrement())
+  company      String?
+  first_name   String
+  last_name    String
+  email        String
+  phone_number String
+  subject      String   @default("Demande de contact")
+  type         String   @default("GENERAL")
+  status       String   @default("NEW")
+  content      String
+  newsletter   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model NewsletterSubscriber {
   id        Int      @id @default(autoincrement())
-  role      String   @default("admin")
-  name      String
   email     String   @unique
-  password  String
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
 }
 
-model Contact {
+model EmailTemplate {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String
-  message   String
+  subject   String
+  content   String   @db.Text
   createdAt DateTime @default(now())
 }
 
 model Article {
-  id         Int      @id @default(autoincrement())
-  title      String
-  teaser     String
-  content    String   @db.Text
-  image      String?
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model Category {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique // Ex: "News", "Blog", "Events"
-  articles  Article[]
-  createdAt DateTime  @default(now())
+  id          Int      @id @default(autoincrement())
+  title       String
+  teaser      String?  @db.Text
+  content     String   @db.Text
+  image       String?
+  category    String
+  createdAt   DateTime @default(now())
 }

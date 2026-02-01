@@ -7,7 +7,7 @@ const AdminMessages = () => {
 
   const fetchMessages = () => {
     setLoading(true);
-    fetch('http://localhost:3000/api/contact')
+    fetch('http://localhost:5000/api/contact')
       .then(res => res.json())
       .then(data => {
         setMessages(data);

@@ -1,15 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
-
 @import "tailwindcss";
 
-/* On garde juste les bases pour la fluidité */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #f8fafc; /* On définit la couleur au plus haut niveau */
 }
 
-body {
+html, body {
   margin: 0;
-  min-width: 320px;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
-  background-color: #f3f4f6; /* Un gris très léger pour faire ressortir tes cartes blanches */
+  background-color: #f8fafc !important; /* Force le bleu ciel partout */
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
