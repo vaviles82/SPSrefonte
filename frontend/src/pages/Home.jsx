@@ -44,13 +44,28 @@ function Home() {
       </section>
 
       {/* Image placeholders */}
-      <section className="py-10 px-10 bg-blue-900/5 text-center w-full">
+      <section className="py-16 px-10 bg-blue-900/5 text-center w-full">
         <h2 className="text-3xl font-bold mb-8 text-[#000260]">Galerie</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
-          <div className="h-48 bg-gray-300 rounded-lg flex items-center justify-center text-gray-500 font-bold uppercase tracking-wider">Court Padel 1</div>
-          <div className="h-48 bg-gray-400 rounded-lg flex items-center justify-center text-gray-500 font-bold uppercase tracking-wider">Club House</div>
-          <div className="h-48 bg-gray-300 rounded-lg flex items-center justify-center text-gray-500 font-bold uppercase tracking-wider">Espace Détente</div>
-          <div className="h-48 bg-gray-400 rounded-lg flex items-center justify-center text-gray-500 font-bold uppercase tracking-wider">Boutique</div>
+          
+          {[
+            { name: "Cour de Padel", img: "https://padeloccitanie.com/media/images/upload/img4.jpg" },
+            { name: "Club House", img: "https://www.padel-rennais.com/sites/padel-rennais.com/files/club-house_0.jpg" },
+            { name: "Espace Détente", img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=400" },
+            { name: "Boutique", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=400" }
+          ].map((item, index) => (
+            <div key={index} className="group relative h-48 overflow-hidden rounded-lg shadow-md bg-gray-200">
+              <img 
+                src={item.img} 
+                alt={item.name} 
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-white font-bold uppercase tracking-wider">{item.name}</span>
+              </div>
+            </div>
+          ))}
+          
         </div>
       </section>
 

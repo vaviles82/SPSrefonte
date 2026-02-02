@@ -26,8 +26,12 @@ const About = () => {
               expérience aux joueurs.
             </p>
           </div>
-          <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center text-gray-500 italic">
-            [Image ou Photo de terrain de Padel]
+          <div className="relative h-80 md:h-full min-h-[300px] overflow-hidden rounded-xl shadow-xl">
+            <img 
+              src="https://terrain-sport.fr/wp-content/uploads/2022/01/Terrain-padel-modulaire-scaled.jpg" 
+              alt="Terrain de Padel SPS" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
           </div>
         </div>
       </section>
