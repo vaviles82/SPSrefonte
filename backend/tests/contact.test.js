@@ -4,33 +4,36 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-describe('Test de l\'API Contact (Intégration)', () => {
+describe('Test de l\'API Requests (Intégration)', () => {
   
-  // Nettoyage de la base de données après les tests
+  // Nettoyage après les tests
   afterAll(async () => {
-    await prisma.contact.deleteMany();
+    // Utilisation de .request au lieu de .contact
+    await prisma.request.deleteMany(); 
     await prisma.$disconnect();
   });
 
-  it('devrait créer un nouveau message de contact en base de données', async () => {
+  it('devrait créer une nouvelle demande en base de données', async () => {
     const res = await request(app)
-      .post('/api/contact')
+      .post('/api/requests') // Route mise à jour
       .send({
-        name: "Test User",
+        first_name: "Test",
+        last_name: "User",
         email: "test@swisspadelstars.ch",
-        message: "Ceci est un test d'intégration avec Docker."
+        phone_number: "0123456789",
+        company: "Test Corp",
+        content: "Ceci est un test d'intégration."
       });
 
-    // Vérification de la réponse HTTP
-    expect(res.statusCode).toEqual(201);
+    // Vérification du code 201 ou 200 selon ton contrôleur
+    expect(res.statusCode).toBe(201); 
     expect(res.body).toHaveProperty('id');
-    expect(res.body.name).toBe("Test User");
 
-    // Vérification réelle dans la base de données Docker via Prisma
-    const contactInDb = await prisma.contact.findUnique({
+    // Vérification réelle dans la DB
+    const requestInDb = await prisma.request.findUnique({
       where: { id: res.body.id }
     });
-    expect(contactInDb).not.toBeNull();
-    expect(contactInDb.email).toBe("test@swisspadelstars.ch");
+    expect(requestInDb).not.toBeNull();
+    expect(requestInDb.first_name).toBe("Test");
   });
 });
