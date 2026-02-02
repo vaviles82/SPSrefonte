@@ -1,88 +1,42 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials({ ...credentials, [name]: value });
-  };
+  const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Test ultra-simple pour ton développement
-    if (credentials.email === "admin@sps.ch" && credentials.password === "ADMIN") {
-      localStorage.setItem('isAdmin', 'true');
-      localStorage.setItem('user', JSON.stringify({ email: "admin@sps.ch" }));
-      window.location.href = "/admin"; // On utilise window.location pour forcer le rafraîchissement du App.jsx
+    // Simulation simplifiée
+    if (email === "admin@sps.ch" && password === "ADMIN") {
+      login({ name: "Valentin", role: "ADMIN", email }, "token-123");
+      navigate("/admin/dashboard");
     } else {
-      alert("Identifiants incorrects");
+      alert("Erreur d'identifiants");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-gray-900">Admin Login</h1>
-          <p className="mt-2 text-sm text-gray-600">Connectez-vous à votre compte</p>
-        </div>
-
-        {error && <div className="p-3 text-sm text-red-700 bg-red-100 rounded-md">{error}</div>}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Adresse Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="admin@sps.ch"
-              value={credentials.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••••"
-              value={credentials.password}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "Connexion..." : "Se connecter"}
-            </button>
-          </div>
-        </form>
-      </div>
+    <div className="flex flex-col items-center justify-center p-10 bg-white shadow-xl rounded-lg mt-10">
+      <h2 className="text-2xl font-bold mb-5">Connexion Administration</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-64">
+        <input 
+          type="email" placeholder="Email" className="border p-2 rounded"
+          value={email} onChange={(e) => setEmail(e.target.value)}
+        />
+        <input 
+          type="password" placeholder="Password" className="border p-2 rounded"
+          value={password} onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          Se connecter
+        </button>
+      </form>
     </div>
   );
 }
 
-export default Login; // L'export default est crucial pour le build !
+export default Login;

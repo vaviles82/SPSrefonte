@@ -4,15 +4,23 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Début du seed...');
 
-  // 1. Abonné Newsletter (déjà présent)
-  await prisma.newsletterSubscriber.upsert({
-    where: { email: 'admin@sps.ch' },
-    update: {},
-    create: {
-      email: 'admin@sps.ch',
-      active: true,
-    },
-  });
+  // 1. Abonnés Newsletter (Ajout de plusieurs profils pour le test)
+  console.log('Création des abonnés newsletter...');
+  const subscribersData = [
+    { email: 'admin@sps.ch', first_name: 'Admin', last_name: 'SPS', company: 'Swiss Padel Stars', active: true },
+    { email: 'j.dupont@orange.fr', first_name: 'Jean', last_name: 'Dupont', company: 'Padel Club Lyon', active: true },
+    { email: 'm.lefe@swiss-startup.ch', first_name: 'Marie', last_name: 'Lefebvre', company: 'Tech Léman', active: true },
+    { email: 'l.muller@padelstars.com', first_name: 'Lucas', last_name: 'Muller', company: 'SPS Partner', active: true },
+    { email: 's.viret@geneve-sport.ch', first_name: 'Sophie', last_name: 'Viret', company: 'Ville de Genève', active: false }
+  ];
+
+  for (const sub of subscribersData) {
+    await prisma.newsletterSubscriber.upsert({
+      where: { email: sub.email },
+      update: {},
+      create: sub,
+    });
+  }
 
   // 2. Demande de contact (déjà présent)
   await prisma.contactRequest.create({

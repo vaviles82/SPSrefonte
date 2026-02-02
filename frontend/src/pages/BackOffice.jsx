@@ -11,12 +11,24 @@ import {
 function BackOffice() {
   const [requests, setRequests] = useState([]);
   const navigate = useNavigate();
+  
+  // Récupération du token stocké lors du login
+  const token = localStorage.getItem('token');
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/requests/getall");
+      const response = await fetch("http://localhost:5000/api/requests", {
+        headers: {
+          'Authorization': `Bearer ${token}` // Transmission du jeton pour authentification
+        }
+      });
+      
+      if (response.status === 401 || response.status === 403) {
+        navigate("/login"); // Redirection si non autorisé (Sécurité)
+        return;
+      }
+
       const data = await response.json();
-      console.log("data", data);
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -24,23 +36,27 @@ function BackOffice() {
   };
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchRequests();
+    }
+  }, [token]);
 
   const updateItem = async (id, status, reqstatus) => {
-    if (reqstatus == "completed" && status == "lu") {
+    if (reqstatus === "completed" && status === "lu") {
       navigate(`/admin/requests/${id}`);
       return;
     }
     try {
       const response = await fetch(
-        `http://localhost:5000/api/requests/update/${id}`,
+        `http://localhost:5000/api/requests/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
           },
-          credentials: "include",
           body: JSON.stringify({ status }),
         }
       );
@@ -49,11 +65,8 @@ function BackOffice() {
         throw new Error(`Error: ${response.statusText}`);
       }
 
-      console.log("Item updated successfully");
-      fetchRequests(); // Refresh the data after updating
+      fetchRequests(); 
       navigate(`/admin/requests/${id}`);
-      console.log(response);
-      return response.json();
     } catch (error) {
       console.error("Failed to update item", error);
     }
@@ -62,11 +75,11 @@ function BackOffice() {
   const deleteItem = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/requests/delete/${id}`,
+        `http://localhost:5000/api/requests/${id}`,
         {
           method: "DELETE",
           headers: {
-            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
           },
         }
       );
@@ -75,9 +88,7 @@ function BackOffice() {
         throw new Error(`Error: ${response.statusText}`);
       }
 
-      console.log("Item deleted successfully");
       fetchRequests();
-      return response.json();
     } catch (error) {
       console.error("Failed to delete item", error);
     }
@@ -122,95 +133,39 @@ function BackOffice() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Company
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Details
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Date
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {requests.map((request) => (
                   <tr
                     key={request.id}
-                    className="hover:bg-red-50 cursor-pointer"
-                    onClick={() => {
-                      updateItem(request.id, "lu", request.status);
-                    }}
+                    className="hover:bg-blue-50 cursor-pointer"
+                    onClick={() => updateItem(request.id, "lu", request.status)}
                   >
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{request.company || "N/A"}</td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {request.company}
+                      <div className="text-sm text-gray-900">{request.first_name} {request.last_name}</div>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <Mail className="w-4 h-4 mr-1" /> {request.email}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {request.first_name} {request.last_name}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <Mail className="w-4 h-4 mr-1" />
-                        {request.userEmail}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <Phone className="w-4 h-4 mr-1" />
-                        {request.phone_number}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {request.content}
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        Newsletter: {request.newsletter ? "No" : "Yes"}
-                      </div>
+                      <div className="text-sm text-gray-900 truncate max-w-xs">{request.content}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         {getStatusIcon(request.status)}
-                        <span className="ml-2 text-sm text-gray-900 capitalize">
-                          {request.status}
-                        </span>
+                        <span className="ml-2 text-sm text-gray-900 capitalize">{request.status}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(request.createdAt).toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {new Date(request.createdAt).toLocaleDateString("fr-FR")}
                     </td>
-                 {/*    <td className="px-6 py-4 text-sm text-gray-500">
-                      <button
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteItem(request.id);
-                        }}
-                      >
-                        X
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      <button
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateItem(request.id, "completed", request.status);
-                        }}
-                      >
-                        completer
-                      </button>
-                    </td> */}
                   </tr>
                 ))}
               </tbody>

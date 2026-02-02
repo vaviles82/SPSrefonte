@@ -1,15 +1,16 @@
 import express from 'express';
+import { authenticateToken } from '../middlewares/auth.js';
 const router = express.Router();
 import * as requestController from '../controllers/requestController.js';
 
-// 1. Les routes STATIQUES (sans paramètres)
-router.get('/stats', requestController.getRequestStats);
-router.get('/', requestController.getRequests);
+// --- ROUTES PUBLIQUES ---
 router.post('/contact', requestController.createRequest);
 
-// 2. Les routes DYNAMIQUES (avec :id) toujours à la fin
-router.get('/:id', requestController.getRequestById);
-router.put('/:id', requestController.updateRequest);
-router.delete('/:id', requestController.deleteRequest);
+// --- ROUTES PROTÉGÉES (ADMIN SEULEMENT) ---
+router.get('/stats', authenticateToken, requestController.getRequestStats);
+router.get('/', authenticateToken, requestController.getRequests);
+router.get('/:id', authenticateToken, requestController.getRequestById);
+router.put('/:id', authenticateToken, requestController.updateRequest);
+router.delete('/:id', authenticateToken, requestController.deleteRequest);
 
 export default router;

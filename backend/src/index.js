@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import newsletterRoutes from './routes/newsletterRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import articleRoutes from './routes/articleRoutes.js';
-
+import { authenticateToken } from './middlewares/auth.js';
 
 dotenv.config();
 
